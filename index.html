@@ -25,7 +25,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_9ebffae1656a064d04ee028129b63108 {
+                #map_9adfb770fb318988ce037b97b8baedb6 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -35,24 +35,22 @@
                 .leaflet-container { font-size: 1rem; }
             </style>
         
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-minimap/3.6.1/Control.MiniMap.css"/>
 </head>
 <body>
     
     
-            <div class="folium-map" id="map_9ebffae1656a064d04ee028129b63108" ></div>
+            <div class="folium-map" id="map_9adfb770fb318988ce037b97b8baedb6" ></div>
         
 </body>
 <script>
     
     
-            var map_9ebffae1656a064d04ee028129b63108 = L.map(
-                "map_9ebffae1656a064d04ee028129b63108",
+            var map_9adfb770fb318988ce037b97b8baedb6 = L.map(
+                "map_9adfb770fb318988ce037b97b8baedb6",
                 {
-                    center: [-33.11405333333333, -64.355895],
+                    center: [-33.123421644558995, -64.34904595605525],
                     crs: L.CRS.EPSG3857,
-                    zoom: 20,
+                    zoom: 10,
                     zoomControl: true,
                     preferCanvas: false,
                 }
@@ -62,52 +60,13 @@
 
         
     
-            var tile_layer_2255176956f8cc7cfe3f967b96319bda = L.tileLayer(
+            var tile_layer_4fbb8c0f1cfb5d24c5208af93246fc7a = L.tileLayer(
                 "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
                 {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
             );
         
     
-            tile_layer_2255176956f8cc7cfe3f967b96319bda.addTo(map_9ebffae1656a064d04ee028129b63108);
-        
-    
-            var tile_layer_f007ded6097d9e8d794c4fca3aca40a1 = L.tileLayer(
-                "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
-                {"attribution": "\u0026copy; \u003ca href=\"https://www.openstreetmap.org/copyright\"\u003eOpenStreetMap\u003c/a\u003e contributors", "detectRetina": false, "maxNativeZoom": 19, "maxZoom": 19, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
-            );
-            var mini_map_975559b3fffe667f6978988612fe6227 = new L.Control.MiniMap(
-                tile_layer_f007ded6097d9e8d794c4fca3aca40a1,
-                {"autoToggleDisplay": false, "centerFixed": false, "collapsedHeight": 25, "collapsedWidth": 25, "height": 150, "minimized": false, "position": "bottomright", "toggleDisplay": true, "width": 150, "zoomAnimation": false, "zoomLevelOffset": -5}
-            );
-            map_9ebffae1656a064d04ee028129b63108.addControl(mini_map_975559b3fffe667f6978988612fe6227);
-        
-    
-            var poly_line_cc48fda7d8cbae451e9dc58ae43febee = L.polyline(
-                [[-33.11405333333333, -64.355895], [-33.11405166666667, -64.35589], [-33.11405, -64.35589333333333], [-33.114055, -64.35588], [-33.114055, -64.35588]],
-                {"bubblingMouseEvents": true, "color": "#FF0000", "dashArray": null, "dashOffset": null, "fill": false, "fillColor": "#FF0000", "fillOpacity": 0.2, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "noClip": false, "opacity": 1.0, "smoothFactor": 1.0, "stroke": true, "weight": 3}
-            ).addTo(map_9ebffae1656a064d04ee028129b63108);
-        
-    
-            poly_line_cc48fda7d8cbae451e9dc58ae43febee.bindTooltip(
-                `<div>
-                     Trayecto recorrido
-                 </div>`,
-                {"sticky": true}
-            );
-        
-    
-            var marker_aad25cf40112a39da229293d5bc06ce2 = L.marker(
-                [-33.114055, -64.35588],
-                {}
-            ).addTo(map_9ebffae1656a064d04ee028129b63108);
-        
-    
-            marker_aad25cf40112a39da229293d5bc06ce2.bindTooltip(
-                `<div>
-                     Última posición
-                 </div>`,
-                {"sticky": true}
-            );
+            tile_layer_4fbb8c0f1cfb5d24c5208af93246fc7a.addTo(map_9adfb770fb318988ce037b97b8baedb6);
         
 </script>
 </html>

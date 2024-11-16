@@ -13,7 +13,7 @@ body {
 nav {
     display: flex;
     align-items: center;
-    background-color: #d1d1d1;
+    background-color: #e7e7e7;
 }
 
 nav img {
@@ -36,4 +36,35 @@ nav a{
 a {
     text-decoration: none;
     font-family: 'Open Sans', sans-serif;
+}
+
+#datos {
+    background-color: #e7e7e7; 
+    padding: 1%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#informacion {
+    width: 75%;
+}
+
+#lugar, #temperatura, #humedad, #precipitaciones, #presion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin: 10px 0;
+}
+
+#grafico {
+    margin: auto;
+    text-align: center;
+}
+
+#grafico img {
+    display: block;
+    width: 125px;
 }
