@@ -31,25 +31,57 @@ def tiempo(lat,lon):
 
 # Funcion para extraer los datos provenientes por el GPS
 
-def extraer_datos(trama):
+def extraer_datos_rmc(trama):
     datos = trama.split(',')
-    if len(datos) >= 6:
+    if len(datos) >= 7:
         # Latitud
-        latitud = float(datos[2][:2]) + float(datos[2][2:]) / 60.0
-        if datos[3] == 'S':
+        latitud = float(datos[3][:2]) + float(datos[3][2:]) / 60.0
+        if datos[4] == 'S':
             latitud = -latitud
         # Longitud
-        longitud = float(datos[4][:3]) + float(datos[4][3:]) / 60.0
-        if datos[5] == 'W':
+        longitud = float(datos[5][:3]) + float(datos[5][3:]) / 60.0
+        if datos[6] == 'W':
             longitud = -longitud
-        return latitud, longitud
+        
+        velocidad= float(datos[7])*1.852
+        
+        return latitud, longitud, velocidad        
+
     return None, None
 
+def extraer_datos_gga(trama):
+    datos = trama.split(',')
+    if len(datos) >= 6:
+        satelites = int(datos[7])
+        altitud = float(datos[9])
+        
+        return satelites, altitud        
 
-# Lista para almacenar puntos de posición (latitud, longitud)
+    return None, None
+
+def calcular_checksum(trama):
+
+    # Excluir el carácter $ inicial y el * si están presentes
+    if trama.startswith('$'):
+        trama = trama[1:]
+    if '*' in trama:
+        trama = trama.split('*')[0]
+    
+    # Calcular el XOR de todos los caracteres
+    checksum = 0
+    for char in trama:
+        checksum ^= ord(char)
+
+    # Convertir a dos dígitos hexadecimales
+    return f"{checksum:02X}"
+
+
+# Lista para almacenar puntos de posición (latitud, longitud,velocidad)
 lat = []
 lon = []
-
+vel = []
+sat = []
+alt = []
 # 
 
 ser = serial.Serial('/dev/ttyUSB0',baudrate=4800)
@@ -64,14 +96,38 @@ try:
         reading = reading.decode("utf-8")
         reading = reading.replace("\r\n","")
 
+        if reading.startswith('$GPRMC'):
+                # Verificar si coincide checksum
+                checksum_calculado = calcular_checksum(reading)
+                checksum_original = reading.split('*')[-1]
+                if checksum_calculado == checksum_original:
+                    # Extraer latitud y longitud de la trama NMEA
+                    latitud, longitud, velocidad = extraer_datos_rmc(reading)
+                    lat.append(latitud)
+                    lon.append(longitud)
+                    vel.append(velocidad)
+                else:
+                    print("El checksum no coincide, la trama puede estar corrupta.")
+
         if reading.startswith('$GPGGA'):
-                # Extraer latitud y longitud de la trama NMEA
-                latitud, longitud = extraer_datos(reading)
-                lat.append(latitud)
-                lon.append(longitud)
+                # Verificar si coincide checksum
+                checksum_calculado = calcular_checksum(reading)
+                checksum_original = reading.split('*')[-1]
+                if checksum_calculado == checksum_original:
+                    # Extraer cantidad de satelites y altitud de la trama NMEA
+                    satelites,altitud = extraer_datos_gga(reading)
+                    sat.append(satelites)
+                    alt.append(altitud)    
+                else:
+                    print("El checksum no coincide, la trama puede estar corrupta.")
+                
+
 
 except KeyboardInterrupt:
     ser.close() 
     print(lat)
     print(lon)
+    print(vel)
+    print(sat)
+    print(alt)
     print("Captura detenida por el usuario.")
