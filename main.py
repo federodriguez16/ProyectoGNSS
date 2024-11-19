@@ -61,6 +61,17 @@ def index():
         time.sleep(3)
         flag = 0
 
+    # Añadimos el mapa que vamos a utilizar para el seguimiento
+
+    map = folium.Map(location=[lat[-1], lon[-1]], zoom_start=15,control_scale=True)
+
+    folium.Marker([lat[-1], lon[-1]], tooltip="Última posición").add_to(map)
+
+    # Creamos el iframe que se colocara en la Pagina
+
+    map.get_root().width = "100%"
+    map.get_root().height = "600px"
+    iframe = map.get_root()._repr_html_()
 
     # Con la Ubicación obtenida, mandamos estos datos a la API para que nos de valores de tiempo
 
@@ -76,7 +87,7 @@ def index():
         "icono": "http://" + str(datos['current']['condition']['icon'])
     }
 
-    return render_template('index.html', datos=informacion)
+    return render_template('index.html', datos=informacion,iframe=iframe)
 
 if __name__ == '__main__':
     app.run(debug=True)
