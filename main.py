@@ -1,133 +1,82 @@
+#Importamos las Librerias a Utilizar
+
+import threading
 import serial
 import folium
 import time
-import requests
+from functions.api import obtener_datos_tiempo
+from functions.tramas_analizador import *
+from flask import Flask, render_template
 
-# Funcion obtencion datos del tiempo
+# Seleccionamos el dispositivo serial a Capturar
 
-def tiempo(lat,lon):
+ser = serial.Serial('/dev/ttyUSB0',baudrate=4800)
 
-    API_KEY = '2367a071311c47f684d211141230207'
-    URL = 'http://api.weatherapi.com/v1/current.json'
+# Listas para almacenar puntos de posición (latitud, longitud,velocidad)
 
-    latitud = -33.123421644558995
-    longitud = -64.34904595605525
-
-    datos = str(latitud) + ',' +  str(longitud)
-
-    parametros = {'key': API_KEY, 'q':datos}
-
-    response = requests.get(URL,parametros)
-    # print(response.status_code)
-    dato = response.json()
-    # print(type(dato))
-
-    print('Ciudad: ' + str(dato['location']['name']))
-    print('Temperatura Actual: ' + str(dato['current']['temp_c']))
-    print('Sensacion Termica: ' + str(dato['current']['feelslike_c']))
-    print('Humedad: ' + str(dato['current']['humidity']))
-    print('Precipitaciones: ' + str(dato['current']['precip_mm']))
-    print('Presion: ' + str(dato['current']['pressure_mb']))
-
-# Funcion para extraer los datos provenientes por el GPS
-
-def extraer_datos_rmc(trama):
-    datos = trama.split(',')
-    if len(datos) >= 7:
-        # Latitud
-        latitud = float(datos[3][:2]) + float(datos[3][2:]) / 60.0
-        if datos[4] == 'S':
-            latitud = -latitud
-        # Longitud
-        longitud = float(datos[5][:3]) + float(datos[5][3:]) / 60.0
-        if datos[6] == 'W':
-            longitud = -longitud
-        
-        velocidad= float(datos[7])*1.852
-        
-        return latitud, longitud, velocidad        
-
-    return None, None
-
-def extraer_datos_gga(trama):
-    datos = trama.split(',')
-    if len(datos) >= 6:
-        satelites = int(datos[7])
-        altitud = float(datos[9])
-        
-        return satelites, altitud        
-
-    return None, None
-
-def calcular_checksum(trama):
-
-    # Excluir el carácter $ inicial y el * si están presentes
-    if trama.startswith('$'):
-        trama = trama[1:]
-    if '*' in trama:
-        trama = trama.split('*')[0]
-    
-    # Calcular el XOR de todos los caracteres
-    checksum = 0
-    for char in trama:
-        checksum ^= ord(char)
-
-    # Convertir a dos dígitos hexadecimales
-    return f"{checksum:02X}"
-
-
-# Lista para almacenar puntos de posición (latitud, longitud,velocidad)
 lat = []
 lon = []
 vel = []
 sat = []
 alt = []
-# 
 
-ser = serial.Serial('/dev/ttyUSB0',baudrate=4800)
+# Variables Auxiliares
 
-try:
+flag = 1
 
-    mapa = folium.Map(location=[-33.123421644558995, -64.34904595605525], zoom_start=10)  # Mapa inicial para evitar errores
+#Definimos nuestra aplicacion flask
 
-    mapa.save("index.html")
+app = Flask(__name__)
+
+# Creamos nuestra funcion que siempre estara tomando datos
+
+def obtener_informacion(lat,lon):
     while(True):
-        reading = ser.readline()
-        reading = reading.decode("utf-8")
-        reading = reading.replace("\r\n","")
-
+        reading = obtener_serial(ser)
         if reading.startswith('$GPRMC'):
-                # Verificar si coincide checksum
-                checksum_calculado = calcular_checksum(reading)
-                checksum_original = reading.split('*')[-1]
-                if checksum_calculado == checksum_original:
-                    # Extraer latitud y longitud de la trama NMEA
-                    latitud, longitud, velocidad = extraer_datos_rmc(reading)
-                    lat.append(latitud)
-                    lon.append(longitud)
-                    vel.append(velocidad)
-                else:
-                    print("El checksum no coincide, la trama puede estar corrupta.")
+            # Verificar si coincide checksum
+            checksum_calculado = calcular_checksum(reading)
+            checksum_original = reading.split('*')[-1]
+            if checksum_calculado == checksum_original:
+                # Extraer latitud longitud y velocidad de la trama NMEA
+                latitud, longitud, velocidad = extraer_datos_rmc(reading)
+                lat.append(latitud)
+                lon.append(longitud)
+                vel.append(velocidad)
+            else:
+                print("El checksum no coincide, la trama RMC esta corrupta.")
 
-        if reading.startswith('$GPGGA'):
-                # Verificar si coincide checksum
-                checksum_calculado = calcular_checksum(reading)
-                checksum_original = reading.split('*')[-1]
-                if checksum_calculado == checksum_original:
-                    # Extraer cantidad de satelites y altitud de la trama NMEA
-                    satelites,altitud = extraer_datos_gga(reading)
-                    sat.append(satelites)
-                    alt.append(altitud)    
-                else:
-                    print("El checksum no coincide, la trama puede estar corrupta.")
-                
+# Pagina Principal
+
+@app.route('/')
+def index():
+
+    # Llamamos a nuestra funcion en un hilo separado para que ejecute independientemente del programa
+
+    global flag
+
+    while(flag == 1):
+        thread = threading.Thread(target=obtener_informacion, args=(lat, lon))
+        thread.start()
+        time.sleep(3)
+        flag = 0
 
 
-except KeyboardInterrupt:
-    ser.close() 
-    print(lat)
-    print(lon)
-    print(vel)
-    print(sat)
-    print(alt)
-    print("Captura detenida por el usuario.")
+    # Con la Ubicación obtenida, mandamos estos datos a la API para que nos de valores de tiempo
+
+    datos = obtener_datos_tiempo(lat[-1],lon[-1])
+
+    informacion = {
+        "locacion": f"{str(datos['location']['name'])}, {str(datos['location']['region'])}, {str(datos['location']['country'])}",
+        "temperatura": str(datos['current']['temp_c']) + "°C",
+        "humedad": str(datos['current']['humidity']) + "%",
+        "precipitaciones": str(datos['current']['precip_mm']),
+        "presion": str(datos['current']['pressure_mb']),
+        "estado": str(datos['current']['condition']['text']),
+        "icono": "http://" + str(datos['current']['condition']['icon'])
+    }
+
+    return render_template('index.html', datos=informacion)
+
+if __name__ == '__main__':
+    app.run(debug=True)
