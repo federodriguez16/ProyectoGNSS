@@ -16,34 +16,34 @@
     {{ iframe|safe }}
 
 
-<div id="datos">
-    <div id="informacion">
-        <div id="lugar">
-            <h2>Actualmente se encuentra en:</h2>
-            <span id="locacion">{{ datos.locacion }}</span>
+    <div id="datos">
+        <div id="informacion">
+            <div id="lugar">
+                <h2>Actualmente se encuentra en:</h2>
+                <span id="locacion">{{ datos.locacion }}</span>
+            </div>
+            <div id="temperatura">
+                <h2>Temperatura:</h2>
+                <span id="locacion">{{ datos.temperatura }}</span>
+            </div>
+            <div id="humedad">
+                <h2>Humedad:</h2>
+                <span id="locacion">{{ datos.humedad }}</span>
+            </div>
+            <div id="precipitaciones">
+                <h2>Precipitaciones:</h2>
+                <span id="locacion">{{ datos.precipitaciones }}</span>
+            </div>
+            <div id="presion">
+                <h2>Presión:</h2>
+                <span id="locacion">{{ datos.presion }}</span>
+            </div>
         </div>
-        <div id="temperatura">
-            <h2>Temperatura:</h2>
-            <span id="locacion">{{ datos.temperatura }}</span>
-        </div>
-        <div id="humedad">
-            <h2>Humedad:</h2>
-            <span id="locacion">{{ datos.humedad }}</span>
-        </div>
-        <div id="precipitaciones">
-            <h2>Precipitaciones:</h2>
-            <span id="locacion">{{ datos.precipitaciones }}</span>
-        </div>
-        <div id="presion">
-            <h2>Presión:</h2>
-            <span id="locacion">{{ datos.presion }}</span>
+        <div id="grafico">
+            <img id="foto" src="{{ datos.icono }}" alt="Estado del clima">
+            <span>{{ datos.estado }}</span>
         </div>
     </div>
-    <div id="grafico">
-        <img id="foto" src="{{ datos.icono }}" alt="Estado del clima">
-        <span>{{ datos.estado }}</span>
-    </div>
-</div>
 
 </body>
 </html>
