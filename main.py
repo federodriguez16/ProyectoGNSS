@@ -1,4 +1,4 @@
-#Importamos las Librerias a Utilizar
+# Importamos las Librerias a Utilizar
 
 import threading
 import serial
@@ -16,9 +16,6 @@ ser = serial.Serial('/dev/ttyUSB0',baudrate=4800)
 
 lat = []
 lon = []
-vel = []
-sat = []
-alt = []
 coordenadas = []
 
 # Variables Auxiliares
@@ -29,10 +26,13 @@ flag = 1
 
 app = Flask(__name__)
 
-# Creamos nuestra funcion que siempre estara tomando datos
+# Creamos nuestra funcion que siempre estar tomando datos
 
 def obtener_informacion(lat,lon,coordenadas):
     while(True):
+        global sat
+        global alt
+        global vel
         reading = obtener_serial(ser)
         if reading.startswith('$GPRMC'):
             # Verificar si coincide checksum
@@ -43,10 +43,14 @@ def obtener_informacion(lat,lon,coordenadas):
                 latitud, longitud, velocidad = extraer_datos_rmc(reading)
                 lat.append(latitud)
                 lon.append(longitud)
-                vel.append(velocidad)
+                vel = velocidad
                 coordenadas.append([latitud,longitud])
             else:
                 print("El checksum no coincide, la trama RMC esta corrupta.")
+        if reading.startswith('$GPGGA'):
+            satelites, altitud = extraer_datos_gga(reading)
+            sat = satelites
+            alt = altitud
 
 # Pagina Principal
 
@@ -85,10 +89,13 @@ def index():
         "locacion": f"{str(datos['location']['name'])}, {str(datos['location']['region'])}, {str(datos['location']['country'])}",
         "temperatura": str(datos['current']['temp_c']) + "°C",
         "humedad": str(datos['current']['humidity']) + "%",
-        "precipitaciones": str(datos['current']['precip_mm']),
-        "presion": str(datos['current']['pressure_mb']),
+        "precipitaciones": str(datos['current']['precip_mm']) + " mm",
+        "presion": str(datos['current']['pressure_mb']) + " mb",
         "estado": str(datos['current']['condition']['text']),
-        "icono": "http://" + str(datos['current']['condition']['icon'])
+        "icono": "http://" + str(datos['current']['condition']['icon']),
+        "velocidad": str(vel) + " km/h",
+        "satelites": str(sat),
+        "altitud": str(alt) + " m"
     }
 
     return render_template('index.html', datos=informacion,iframe=iframe)

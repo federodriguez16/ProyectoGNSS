@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/styles.css">
     <title>Seguimiento de Posición</title>
-    <meta http-equiv="refresh" content="10">
+    <meta http-equiv="refresh" content="60">
 </head>
 <body>
     <nav>
@@ -13,8 +13,23 @@
         <a href="/">Seguimiento de Posición</a>
     </nav>
 
-    {{ iframe|safe }}
-
+    <div id="mapa">
+        {{ iframe|safe }}
+        <div id="info-adicional">
+            <div id="presion">
+                <h4>Velocidad:</h2>
+                <span id="locacion">{{ datos.velocidad }}</span>
+            </div>
+            <div id="presion">
+                <h4>Altitud:</h2>
+                <span id="locacion">{{ datos.altitud }}</span>
+            </div>
+            <div id="presion">
+                <h4>Satelites Utilizados:</h2>
+                <span id="locacion">{{ datos.satelites }}</span>
+            </div>
+        </div>
+    </div>
 
     <div id="datos">
         <div id="informacion">
