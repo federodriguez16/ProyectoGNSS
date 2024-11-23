@@ -12,7 +12,7 @@ def extraer_datos_rmc(trama):
         if datos[6] == 'W':
             longitud = -longitud
         
-        velocidad= float(datos[7])*1.852
+        velocidad= round(float(datos[7])*1.852, 2)
         
         return latitud, longitud, velocidad        
 
