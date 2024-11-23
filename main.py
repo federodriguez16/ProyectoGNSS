@@ -19,6 +19,7 @@ lon = []
 vel = []
 sat = []
 alt = []
+coordenadas = []
 
 # Variables Auxiliares
 
@@ -30,8 +31,11 @@ app = Flask(__name__)
 
 # Creamos nuestra funcion que siempre estara tomando datos
 
-def obtener_informacion(lat,lon):
+def obtener_informacion(lat,lon,coordenadas):
     while(True):
+
+        global i
+
         reading = obtener_serial(ser)
         if reading.startswith('$GPRMC'):
             # Verificar si coincide checksum
@@ -43,6 +47,7 @@ def obtener_informacion(lat,lon):
                 lat.append(latitud)
                 lon.append(longitud)
                 vel.append(velocidad)
+                coordenadas.append([latitud,longitud])
             else:
                 print("El checksum no coincide, la trama RMC esta corrupta.")
 
@@ -56,14 +61,16 @@ def index():
     global flag
 
     while(flag == 1):
-        thread = threading.Thread(target=obtener_informacion, args=(lat, lon))
+        thread = threading.Thread(target=obtener_informacion, args=(lat, lon,coordenadas))
         thread.start()
         time.sleep(3)
         flag = 0
 
     # Añadimos el mapa que vamos a utilizar para el seguimiento
 
-    map = folium.Map(location=[lat[-1], lon[-1]], zoom_start=15,control_scale=True)
+    map = folium.Map(location=[lat[-1], lon[-1]], zoom_start=17,control_scale=True)
+
+    folium.PolyLine(locations=coordenadas, color="#FF0000", weight=3, tooltip="Trayecto recorrido").add_to(map)
 
     folium.Marker([lat[-1], lon[-1]], tooltip="Última posición").add_to(map)
 
