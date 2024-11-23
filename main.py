@@ -33,9 +33,6 @@ app = Flask(__name__)
 
 def obtener_informacion(lat,lon,coordenadas):
     while(True):
-
-        global i
-
         reading = obtener_serial(ser)
         if reading.startswith('$GPRMC'):
             # Verificar si coincide checksum
