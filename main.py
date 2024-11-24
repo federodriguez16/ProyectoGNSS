@@ -18,10 +18,6 @@ lat = []
 lon = []
 coordenadas = []
 
-# Variables Auxiliares
-
-flag = 1
-
 #Definimos nuestra aplicacion flask
 
 app = Flask(__name__)
@@ -52,6 +48,9 @@ def obtener_informacion(lat,lon,coordenadas):
             sat = satelites
             alt = altitud
 
+thread = threading.Thread(target=obtener_informacion, args=(lat, lon, coordenadas))
+thread.start()
+
 # Pagina Principal
 
 @app.route('/')
@@ -59,13 +58,6 @@ def index():
 
     # Llamamos a nuestra funcion en un hilo separado para que ejecute independientemente del programa
 
-    global flag
-
-    while(flag == 1):
-        thread = threading.Thread(target=obtener_informacion, args=(lat, lon,coordenadas))
-        thread.start()
-        time.sleep(3)
-        flag = 0
 
     # Añadimos el mapa que vamos a utilizar para el seguimiento
 
