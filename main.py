@@ -3,6 +3,7 @@
 import threading
 import serial
 import folium
+import argparse
 from functions.api import obtener_datos_tiempo
 from functions.tramas_analizador import *
 from flask import Flask, render_template
@@ -10,6 +11,12 @@ from flask import Flask, render_template
 # Seleccionamos el dispositivo serial a Capturar
 
 ser = serial.Serial('/dev/ttyUSB0',baudrate=4800)
+
+parser = argparse.ArgumentParser(description="Descripción del script")
+
+parser.add_argument("api_key", help="key from weatherapi")  # Obligatorio
+
+args = parser.parse_args()
 
 # Listas para almacenar puntos de posición (latitud, longitud,velocidad)
 
@@ -74,7 +81,7 @@ def index():
 
     # Con la Ubicación obtenida, mandamos estos datos a la API para que nos de valores de tiempo
 
-    datos = obtener_datos_tiempo(lat[-1],lon[-1])
+    datos = obtener_datos_tiempo(lat[-1],lon[-1],args.api_key)
 
     informacion = {
         "locacion": f"{str(datos['location']['name'])}, {str(datos['location']['region'])}, {str(datos['location']['country'])}",
