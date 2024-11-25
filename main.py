@@ -3,7 +3,6 @@
 import threading
 import serial
 import folium
-import time
 from functions.api import obtener_datos_tiempo
 from functions.tramas_analizador import *
 from flask import Flask, render_template
