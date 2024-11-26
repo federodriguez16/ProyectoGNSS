@@ -23,13 +23,17 @@ pip install -r requirements.txt
 Para inicializar el servidor web, ejecuta el script main.py con el siguiente comando:
 
 ```bash
-python3 main.py
+python3 main.py <key de WeatherAPI>
 ```
 
 Accede a la interfaz principal en http://127.0.0.1:5000. La interfaz incluye varias datos y estadisticas que se pueden observar en base a la localizacion actual.
+
+![muestra](img/muestra.jpeg)
 
 ## Referencias
 
 https://flask.palletsprojects.com
 
 https://www.python.org/
+
+https://python-visualization.github.io/folium/latest/
